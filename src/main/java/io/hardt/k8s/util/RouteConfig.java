@@ -16,7 +16,7 @@ public class RouteConfig {
 
         return RouterFunctions
                 .route(RequestPredicates.GET("/"), indexHandler::index)
-                .andRoute(RequestPredicates.GET("/eoj"), indexHandler::eoj);
+                .andRoute(RequestPredicates.GET("/triadapi/api/callBojEoj/EOJ/{dt}"), indexHandler::eoj);
 
 
     }

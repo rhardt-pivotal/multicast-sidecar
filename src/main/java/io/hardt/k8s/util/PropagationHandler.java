@@ -57,7 +57,7 @@ public class PropagationHandler
 
     private KubernetesClient kubeClient;
 
-    private Expression serialNumberExpression;
+    private Expression serialNumberExpression, pathExpression;
 
     private Map<String, Expression> headerExpressionCache, paramExpressionCache;
 
@@ -66,7 +66,8 @@ public class PropagationHandler
 
     public PropagationHandler() {
         expressionParser = new SpelExpressionParser();
-        serialNumberExpression = expressionParser.parseExpression(" io.hardt.propagationsidecar.sequenceNumber");
+        serialNumberExpression = expressionParser.parseExpression("io.hardt.propagationsidecar.sequenceNumber");
+        pathExpression = expressionParser.parseExpression("io.hardt.propagationsidecar.siblingPath");
         kubeClient = new DefaultKubernetesClient();
         headerExpressionCache = new HashMap<>();
         paramExpressionCache = new HashMap<>();
@@ -87,13 +88,15 @@ public class PropagationHandler
     public Mono<ServerResponse> eoj(ServerRequest req) {
         //grab all the secret headers and put them in their secrets
 
+        log.info("Headers via secret: "+sidecarConfig.getHeadersViaSecret());
         if (sidecarConfig.getHeadersViaSecret() != null){
             sidecarConfig.getHeadersViaSecret().stream().forEach(
                     headerName -> {
-                        String secretName = appName+"-"+headerName;
+                        String secretName = appName.toLowerCase()+"-"+headerName.toLowerCase();
                         req.headers().header(headerName).stream().forEach(
                                 headerValue -> {
                                     Secret secret = kubeClient.secrets().withName(secretName).get();
+                                    log.info("existing secret: "+secret);
                                     if (secret == null) {
                                         secret = new SecretBuilder().withNewMetadata()
                                                 .withName(secretName)
@@ -105,7 +108,9 @@ public class PropagationHandler
                                         secret.setStringData(new HashMap<>());
                                     }
                                     secret.getStringData().put(headerName, headerValue);
-                                    kubeClient.secrets().createOrReplace(secret);
+                                    log.info("creating secret: "+secret);
+                                    Secret s2 = kubeClient.secrets().createOrReplace(secret);
+                                    log.info("result: "+s2);
                                 }
                         );
                     }
@@ -126,6 +131,10 @@ public class PropagationHandler
         int sn = Integer.parseInt( serialNumberExpression.getValue(context).toString());
         sn = sn + 1;
         serialNumberExpression.setValue(context, sn);
+
+        String dtPath = req.pathVariable("dt");
+        pathExpression.setValue(context, dtPath);
+
 
         //update all the headers
         sidecarConfig.getHeaders().keySet().stream().forEach(
@@ -205,7 +214,7 @@ public class PropagationHandler
         if (sidecarConfig.getHeadersViaSecret() != null){
             sidecarConfig.getHeadersViaSecret().stream().forEach(
                     headerName -> {
-                        String secretName = appName+"-"+headerName;
+                        String secretName = appName.toLowerCase()+"-"+headerName.toLowerCase();
                         Secret s = kubeClient.secrets().withName(secretName).get();
                         headers.put(headerName, new String(Base64.getDecoder().decode(s.getData().get(headerName))));
                     }
@@ -227,14 +236,14 @@ public class PropagationHandler
                 }
         );
 
-
+        String siblingPath = pathExpression.getValue(context).toString();
 
 
         URI uri = UriComponentsBuilder.newInstance()
                 .scheme(sidecarConfig.getSiblingScheme())
                 .host(sidecarConfig.getSiblingHost())
                 .port(sidecarConfig.getSiblingPort())
-                .path(sidecarConfig.getSiblingPath())
+                .path(sidecarConfig.getSiblingPathPrefix()+siblingPath)
                 .queryParams(params).build().toUri();
 
         log.info("URI:  "+uri);

@@ -2,14 +2,17 @@ io:
   hardt:
     propagationsidecar:
       headersViaSecret:
-      - xx-jwt-token
+      - Authorization
       headers:
-        xx-test-header-1: unset
-        xx-test-header-2: unset
+        service-transaction-id: unset
+        Content-Type: unset
+        application-id: unset
+        sender-id: unset
       params:
         xx-test-param-1: unset
       sequenceNumber: 100
-      siblingPort: 8084
+      siblingPort: 7001
       siblingHost: "localhost"
-      siblingPath: "/eoj"
+      siblingPathPrefix: "/triadapi/api/callBojEoj/EOJ/"
+      siblingPath: ""
       siblingScheme: http

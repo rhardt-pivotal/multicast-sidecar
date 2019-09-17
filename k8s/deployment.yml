@@ -18,21 +18,21 @@ spec:
         app: propagationdemo
     spec:
       containers:
-      - image: rhardt/propagation-sidecar:0.0.29
-        imagePullPolicy: Never
+      - image: rhardt/propagation-sidecar:0.0.50
+        #imagePullPolicy: Never
         name: propagation-sidecar
-        command: ["java","-Djava.security.egd=file:/dev/./urandom", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005", "-jar","/app.jar"]
+        command: ["java","-Djava.security.egd=file:/dev/./urandom", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar","/app.jar"]
         resources: {}
         env:
           - name: "SERVER_PORT"
             value: "8085"
-      - image: rhardt/dummy-endpoint:0.0.2
-        imagePullPolicy: Never
+      - image: rhardt/dummy-endpoint:0.0.3
+        #imagePullPolicy: Never
         name: dummy-endpoint
         resources: {}
         env:
           - name: "SERVER_PORT"
-            value: "8084"
+            value: "7001"
       serviceAccountName: config-reader
 
 status: {}

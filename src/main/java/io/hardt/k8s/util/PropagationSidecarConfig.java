@@ -17,6 +17,7 @@ public class PropagationSidecarConfig {
     private int sequenceNumber;
     private String siblingHost = "127.0.0.1";
     private int siblingPort = 8080;
+    private String siblingPathPrefix;
     private String siblingPath;
     private String siblingScheme = "http";
 
@@ -89,6 +90,11 @@ public class PropagationSidecarConfig {
         return new PropagationSidecarPojo(getHeadersViaSecret(), getHeaders(), getParams(), getSequenceNumber());
     }
 
+    public String getSiblingPathPrefix() {
+        return siblingPathPrefix;
+    }
 
-
+    public void setSiblingPathPrefix(String siblingPathPrefix) {
+        this.siblingPathPrefix = siblingPathPrefix;
+    }
 }
