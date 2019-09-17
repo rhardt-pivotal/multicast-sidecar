@@ -1,0 +1,23 @@
+logging:
+  level:
+    org:
+      springframework:
+        cloud: debug
+
+management:
+  endpoint:
+    restart:
+      enabled: true
+    health:
+      enabled: true
+    info:
+      enabled: true
+    env:
+      enabled: true
+    configprops:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+

@@ -1,0 +1,15 @@
+io:
+  hardt:
+    propagationsidecar:
+      headersViaSecret:
+      - xx-jwt-token
+      headers:
+        xx-test-header-1: unset
+        xx-test-header-2: unset
+      params:
+        xx-test-param-1: unset
+      sequenceNumber: 100
+      siblingPort: 8084
+      siblingHost: "localhost"
+      siblingPath: "/eoj"
+      siblingScheme: http

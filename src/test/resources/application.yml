@@ -1,0 +1,32 @@
+io:
+  hardt:
+    propagationsidecar:
+      headersViaSecret:
+        xx-jwt-token: ${spring.application.name}-xx-jwt-token
+      headers:
+        xx-sequence-number: io.hardt.propagationsidecar.sequence-number
+      params:
+        word: io.hardt.propagationsidecar.word
+      sequenceNumber: 100
+      word: rapscallion
+      siblingPort: 8084
+      siblingHost: "localhost"
+      siblingPath: "/eoj"
+      siblingScheme: http
+
+management:
+  endpoint:
+    restart:
+      enabled: true
+    health:
+      enabled: true
+    info:
+      enabled: true
+    env:
+      enabled: true
+    configprops:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"

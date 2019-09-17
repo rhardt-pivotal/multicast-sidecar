@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: propagation-sidecar
+  cloud:
+    kubernetes:
+      reload:
+        enabled: true
+        mode: event
+      config:
+        name: ${spring.application.name}

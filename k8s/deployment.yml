@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: propagationdemo
+  name: pdemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: propagationdemo
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: propagationdemo
+    spec:
+      containers:
+      - image: rhardt/propagation-sidecar:0.0.29
+        imagePullPolicy: Never
+        name: propagation-sidecar
+        command: ["java","-Djava.security.egd=file:/dev/./urandom", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005", "-jar","/app.jar"]
+        resources: {}
+        env:
+          - name: "SERVER_PORT"
+            value: "8085"
+      - image: rhardt/dummy-endpoint:0.0.2
+        imagePullPolicy: Never
+        name: dummy-endpoint
+        resources: {}
+        env:
+          - name: "SERVER_PORT"
+            value: "8084"
+      serviceAccountName: config-reader
+
+status: {}
